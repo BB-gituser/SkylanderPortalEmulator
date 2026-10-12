@@ -1,0 +1,17 @@
+*.a
+*.lib
+*.o
+*.obj
+*.out
+
+.idea/
+*~
+*.DotSettings.user
+
+.vscode/
+
+
+build/
+pico_sdk_import.cmake
+*.swp
+
