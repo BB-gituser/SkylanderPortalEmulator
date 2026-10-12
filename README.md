@@ -1,12 +1,12 @@
 # SkylanderPortalEmulator
 
-> This project is a fork of [KAOS](https://github.com/NicoAICP/KAOS) by [NicoAICP](https://github.com/NicoAICP)
+> This project is a fork of [KAOS](https://github.com/NicoAICP/KAOS) by [NicoAICP](https://github.com/NicoAICP).
 
 <hr>
 
 ## SETUP
 
-### CLONE AND INIT THE PROJECT
+### CLONE AND INITIALIZE THE PROJECT
 
 ```sh
 git clone https://github.com/BB-gituser/SkylanderPortalEmulator.git
@@ -16,12 +16,14 @@ git submodule update --init --recursive
 
 ### COMPILE THE PROJECT
 
-first you need to download PICO SDK
+First, ensure you have the Pico SDK and required build tools installed on your system
 
 ```sh
 sudo apt update
 sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential git python3
 ```
+
+If you haven't set up the Pico SDK yet, you can initialize it with the following commands
 
 ```sh
 # sample
@@ -34,13 +36,15 @@ sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essent
 )
 ```
 
+Next, copy the configuration and import files into your project workspace
+
 ```sh
 cp ./includes/tusb_config.h $PICO_SDK_PATH/lib/tinyusb/src/tusb_config.h
 # copy pico_sdk_import.cmake
 cp $PICO_SDK_PATH/external/pico_sdk_import.cmake .
 ```
 
-compilation
+Build the project using CMake and Make
 
 ```sh
 (
@@ -49,9 +53,8 @@ compilation
     rm -rf *
     clear && cmake -DCMAKE_BUILD_TYPE=Release -DPICO_BOARD=pico_w -DTFT_OPTIONS="TFT_ENABLE_RED;TFT_ENABLE_RESET;TFT_ENABLE_TEXT;TFT_ENABLE_SHAPES;TFT_ENABLE_ROTATE" .. && clear && make -j$(nproc)
 )
-# replace TFT_ENABLE_RED by the color of your LCD TFT
 ```
-
+> **Note:** Remember to replace `TFT_ENABLE_RED` with the color option that matches your specific LCD TFT display.
 
 ## Creating the Pico Board
 
@@ -87,22 +90,23 @@ compilation
 
 ## Features
 
-- load skylanders bin files
+- Load and emulate Skylanders `.bin` files directly from an SD card
+- TFT LCD user interface support
+- Joystick navigation support
 
-## ideas
+## ROADMAP / IDEAS
 
-- [X] use joystick
-- [X] use TFT LCD
+- [X] joystick support
+- [X] TFT LCD support
 - [ ] option Menu
-- [ ] add IR controller
-- [ ] add NFC reader to save real figurines bin files in the sd card
-- [ ] detail menu for bin files
-- [ ] edit bin files (set money, set level)
+- [ ] IR controller support
+- [ ] NFC reader support to save physical figurine `.bin` files in the SD card
+- [ ] detail menu for `.bin` files
+- [ ] edit `bin` files (e.g., modify money, level)
 
 ## Usage
 
-
-
+*Coming soon.*
 
 
 ## Known Issues
@@ -113,12 +117,13 @@ compilation
 
 ## CHANGELOGS
 
-1. implement the TFT LCD
-2. implement the Joystick
+- **V0.1**
+  - implement the TFT LCD
+  - implement the Joystick
 
 ## RESSOURCES
 
-### Skylanders bin files
+### Skylanders `bin` files
 
 - [skylandersNFC](https://github.com/skylandersNFC)
 - [Skylanders-Ultimate-NFC-Pack](https://github.com/skylandersNFC/Skylanders-Ultimate-NFC-Pack)
