@@ -55,7 +55,7 @@ compilation
 
 ## Creating the Pico Board
 
-<!--![Connection Diagram](url image)-->
+![Connection Diagram](https://raw.githubusercontent.com/BB-gituser/SkylanderPortalEmulator/refs/heads/main/images/create_board.png)
 
 ### LCD TFT
 - SCK     : GP14 (pin 19)
