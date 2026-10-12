@@ -4,6 +4,7 @@
 
 #include "ST7735_TFT.h"
 #include "pico/stdlib.h"
+#include "pico/time.h"
 
 #include "../includes/constant.h"
 #include "../includes/display.h"
@@ -11,7 +12,7 @@
 #include "../includes/menu.h"
 #include "../includes/pins.h"
 #include "../includes/sd.h"
-#include "pico/time.h"
+#include "../includes/utils.h"
 
 /*
 Main MENU
@@ -240,7 +241,7 @@ void select_file_render_menu(int player, Folder *folder) {
         return;
       }
       
-      if (fd_in_array(F, loaded_skylanders, MAX_SKYLANDER_COUNT) != 0)
+      if (fd_in_array(F.item, loaded_skylanders, MAX_SKYLANDER_COUNT) != 0)
         return;
       
         if (*(loaded_skylanders + player - 1)) {

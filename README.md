@@ -123,7 +123,7 @@ Build the project using CMake and Make
 
 ## RESSOURCES
 
-### Skylanders `bin` files
+### Skylanders `.bin` files
 
 - [skylandersNFC](https://github.com/skylandersNFC)
 - [Skylanders-Ultimate-NFC-Pack](https://github.com/skylandersNFC/Skylanders-Ultimate-NFC-Pack)
