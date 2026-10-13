@@ -32,8 +32,8 @@ If you haven't set up the Pico SDK yet, you can initialize it with the following
     git clone https://github.com/raspberrypi/pico-sdk.git
     cd pico-sdk
     git submodule update --init
-    export PICO_SDK_PATH=~/pico-sdk
 )
+export PICO_SDK_PATH=~/pico-sdk
 ```
 
 Next, copy the configuration and import files into your project workspace
