@@ -4,6 +4,12 @@
 
 <hr>
 
+> **[WARNING]**<br>
+> **Work In Progress> (WIP) — Not Functional**<br>
+> This project is currently under intensive development. The code is **not working** yet and is not ready for use.
+
+<hr>
+
 ## SETUP
 
 ### CLONE AND INITIALIZE THE PROJECT
