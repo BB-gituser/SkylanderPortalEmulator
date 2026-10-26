@@ -8,6 +8,27 @@
 #include "../includes/usb.h"
 #include "../includes/utils.h"
 
+// usb.c
+#define QUEUE_LEN 32
+static uint8_t queue[QUEUE_LEN][MSG_SIZE];
+static volatile uint8_t queue_head = 0, queue_tail = 0;
+
+static bool queue_push(const uint8_t *report) {
+  uint8_t next = (queue_head + 1) % QUEUE_LEN;
+  if (next == queue_tail) return false;
+  memcpy(queue[queue_head], report, MSG_SIZE);
+  queue_head = next;
+  return true;
+}
+bool queue_is_empty(void) { return queue_head == queue_tail; }
+
+void queue_dequeue(void) {
+  if (!queue_is_empty() && tud_hid_ready() &&
+      tud_hid_report(0, queue[queue_tail], MSG_SIZE))
+    queue_tail = (queue_tail + 1) % QUEUE_LEN;
+}
+
+
 // doc https://docs.tinyusb.org/en/latest/reference/class/device.html
 
 static FIL *slot_file(uint8_t index_byte) {
@@ -15,13 +36,19 @@ static FIL *slot_file(uint8_t index_byte) {
   if (slot >= MAX_SKYLANDER_COUNT) {
     return NULL;
   }
-  return loaded_skylanders[slot];
+  Slot *s = get_slot_from_index(slot);
+  if (!s)
+    return NULL;
+  return s->fil;
 }
 
-static void send_report(const uint8_t *report) {
-  if (!tud_hid_report(0, report, MSG_SIZE)) {
-    return;
-  }
+void send_report(const uint8_t *report) {
+  send_report_size(report, MSG_SIZE);
+}
+
+void send_report_size(const uint8_t *report, int size) {
+  (void)size;
+  queue_push(report);
 }
 
 void tud_mount_cb(void) {}
@@ -52,8 +79,6 @@ uint16_t tud_hid_get_report_cb(uint8_t instance, uint8_t report_id,
   return 0;
 }
 
-
-
 void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
                            hid_report_type_t report_type, uint8_t const *buffer,
                            uint16_t bufsize) {
@@ -62,7 +87,7 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
   (void)report_type; // type de repport demandé
   (void)buffer;      // input
   (void)bufsize;     // taille input
-  
+
   uint8_t out[MSG_SIZE];
   if (report_type != HID_REPORT_TYPE_OUTPUT &&
       report_type != HID_REPORT_TYPE_INVALID) {
@@ -75,11 +100,10 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
 
   char b = *buffer;
 
-   
   memset(out, 0, sizeof out);
 
   if (b == 'R') {
-    shutthefuckup = true;
+    // shutthefuckup = true;
     out[0] = 0x52;
     out[1] = 0x02;
     out[2] = 0x1b;
@@ -94,86 +118,31 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
     out[3] = 0x77;
     send_report(out);
     if (bufsize > 1 && buffer[1] == 0x01) {
-      shutthefuckup = false;
+      // shutthefuckup = false;
     }
   } else if (b == 'S') { // etats des figurines
-    out[0] = 0x53;
-    out[1] = create_sense_bitmask(loaded_skylanders, MAX_SKYLANDER_COUNT);
-    out[5] = sense_counter++;
-    out[6] = 0x01;
-    
-    send_report(out);
+    send_status();
+
   } else if (b == 'Q') { // lire block de 16 octets
     if (bufsize < 3) {
       return;
     }
-    //char msg[COLS + 1];
-    //snprintf(msg, sizeof msg, "detect %X %c %s %16X", b, b, buffer, buffer);
-    //drawText(2, 4, msg, ST7735_GREEN, ST7735_BLACK, 1);
     FIL *f = slot_file(buffer[1]);
-    if (!f) return;
+    if (!f)
+      return;
     out[0] = 0x51;
     out[2] = buffer[2];
 
     out[1] = 0x10 | (buffer[1] & 0x0F);
-    /*
-    *out = 0x51;
-    *(out + 1) = 0x10;
-
-    if (buffer[1] == 0x10 || buffer[1] == 0x20 || buffer[1] == 0x30 ||
-        buffer[1] == 0x40 || buffer[1] == 0x50 || buffer[1] == 0x60 ||
-        buffer[1] == 0x70 || buffer[1] == 0x80 || buffer[1] == 0x90 ||
-        buffer[1] == 0xA0 || buffer[1] == 0xB0 || buffer[1] == 0xC0 ||
-        buffer[1] == 0xD0 || buffer[1] == 0xE0 || buffer[1] == 0xF0) {
-      *(out + 1) = 0x10;
-    }
-    if (buffer[1] == 0x11 || buffer[1] == 0x21 || buffer[1] == 0x31 ||
-        buffer[1] == 0x41 || buffer[1] == 0x51 || buffer[1] == 0x61 ||
-        buffer[1] == 0x71 || buffer[1] == 0x81 || buffer[1] == 0x91 ||
-        buffer[1] == 0xA1 || buffer[1] == 0xB1 || buffer[1] == 0xC1 ||
-        buffer[1] == 0xD1 || buffer[1] == 0xE1 || buffer[1] == 0xF1) {
-      *(out + 1) = 0x11;
-    }
-    if (buffer[1] == 0x12 || buffer[1] == 0x22 || buffer[1] == 0x32 ||
-        buffer[1] == 0x42 || buffer[1] == 0x52 || buffer[1] == 0x62 ||
-        buffer[1] == 0x72 || buffer[1] == 0x82 || buffer[1] == 0x92 ||
-        buffer[1] == 0xA2 || buffer[1] == 0xB2 || buffer[1] == 0xC2 ||
-        buffer[1] == 0xD2 || buffer[1] == 0xE2 || buffer[1] == 0xF2) {
-      *(out + 1) = 0x12;
-    }
-
-    *(out + 2) = buffer[2];
-    midbuffer = calloc(BLOCK_SIZE, 1);
-
-    if (buffer[1] == 0x10 || buffer[1] == 0x20 || buffer[1] == 0x30 ||
-        buffer[1] == 0x40 || buffer[1] == 0x50 || buffer[1] == 0x60 ||
-        buffer[1] == 0x70 || buffer[1] == 0x80 || buffer[1] == 0x90 ||
-        buffer[1] == 0xA0 || buffer[1] == 0xB0 || buffer[1] == 0xC0 ||
-        buffer[1] == 0xD0 || buffer[1] == 0xE0 || buffer[1] == 0xF0) {
-      curfile = loaded_skylanders[0];
-    }
-    if (buffer[1] == 0x11 || buffer[1] == 0x21 || buffer[1] == 0x31 ||
-        buffer[1] == 0x41 || buffer[1] == 0x51 || buffer[1] == 0x61 ||
-        buffer[1] == 0x71 || buffer[1] == 0x81 || buffer[1] == 0x91 ||
-        buffer[1] == 0xA1 || buffer[1] == 0xB1 || buffer[1] == 0xC1 ||
-        buffer[1] == 0xD1 || buffer[1] == 0xE1 || buffer[1] == 0xF1) {
-      curfile = loaded_skylanders[1];
-    }
-    if (buffer[1] == 0x12 || buffer[1] == 0x22 || buffer[1] == 0x32 ||
-        buffer[1] == 0x42 || buffer[1] == 0x52 || buffer[1] == 0x62 ||
-        buffer[1] == 0x72 || buffer[1] == 0x82 || buffer[1] == 0x92 ||
-        buffer[1] == 0xA2 || buffer[1] == 0xB2 || buffer[1] == 0xC2 ||
-        buffer[1] == 0xD2 || buffer[1] == 0xE2 || buffer[1] == 0xF2) {
-      curfile = loaded_skylanders[2];
-    }*/
 
     UINT actual_len = 0;
+
     f_lseek(f, buffer[2] * BLOCK_SIZE);
+
     FRESULT fr = f_read(f, out + 3, BLOCK_SIZE, &actual_len);
 
     if (fr != FR_OK || actual_len != BLOCK_SIZE) {
-      printf("Read: fr=%d len=%u (attendu %u)\n", (int)fr, (unsigned)actual_len,
-             (unsigned)BLOCK_SIZE);
+      // error
       return;
     }
     send_report(out);
@@ -181,10 +150,11 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
     if (bufsize < 3 + BLOCK_SIZE) {
       return;
     }
-    FIL *f = slot_file(buffer[1]);
-    if (f == NULL) {
+    Slot *s = get_slot_from_index(buffer[1] & 0x0F);
+    if (s == NULL) {
       return;
     }
+    FIL *f = s->fil;
 
     UINT actual_len = 0;
     f_lseek(f, buffer[2] * BLOCK_SIZE); // positionner AVANT d'ecrire
@@ -303,7 +273,7 @@ void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id,
     uint16_t n = bufsize < MSG_SIZE ? bufsize : MSG_SIZE;
     memcpy(out, buffer, n);
     send_report(out);
-  } 
+  }
 
   return;
 }

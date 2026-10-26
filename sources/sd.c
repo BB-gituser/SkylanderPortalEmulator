@@ -24,6 +24,8 @@
 #define NAME_SIZE (sizeof(((File *)0)->filename))
 #define PATH_SIZE (sizeof(((File *)0)->path))
 
+int nfile = 0;
+
 static void copy_str(char *dst, size_t dst_size, const char *src) {
   size_t n = strlen(src);
   if (n >= dst_size)
@@ -128,6 +130,8 @@ static bool scan_into(Folder *self, int depth) {
         continue;
       File *file = &self->filelist[fi++];
       copy_str(file->filename, NAME_SIZE, fno->fname);
+      file->FileIndex = nfile;
+      nfile++;
       join_path(file->path, PATH_SIZE, self->path, fno->fname);
       file->parent = self;
     }
@@ -165,60 +169,7 @@ Folder *scan_directory(char path[256], Folder *parent_folder) {
   return folder;
 }
 
-FRESULT sd_file_open(File *file, BYTE mode) {
-  if (!file)
-    return FR_INVALID_PARAMETER;
-  if (file->item)
-    return FR_OK;
-
-  FIL *fp = calloc(1, sizeof *fp);
-  if (!fp)
-    return FR_NOT_ENOUGH_CORE;
-
-  FRESULT fr = f_open(fp, file->path, mode);
-  if (fr != FR_OK) {
-    free(fp);
-    return fr;
-  }
-  file->item = fp;
-  return FR_OK;
-}
-
-FRESULT sd_file_close(File *file) {
-  if (!file || !file->item)
-    return FR_OK;
-
-  FRESULT fr = f_close(file->item);
-  free(file->item);
-  file->item = NULL;
-  return fr;
-}
-
-static void free_folder_contents(Folder *f) {
-  for (int i = 0; i < f->folder_count; i++)
-    free_folder_contents(&f->folderlist[i]);
-  for (int i = 0; i < f->file_count; i++)
-    sd_file_close(&f->filelist[i]);
-  if (f->item) {
-    f_close(f->item);
-    free(f->item);
-    f->item = NULL;
-  }
-  free(f->folderlist);
-  free(f->filelist);
-  f->folderlist = NULL;
-  f->filelist = NULL;
-  f->folder_count = f->file_count = 0;
-}
-
-void free_folder(Folder *folder) {
-  if (!folder)
-    return;
-  free_folder_contents(folder);
-  free(folder);
-}
-
 Folder *scan_sd_root(void) {
-  char root_path[256] = "0:/";
+  char root_path[256] = "0:/Skylanders/";
   return scan_directory(root_path, NULL);
 }

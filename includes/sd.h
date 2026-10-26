@@ -52,10 +52,10 @@ typedef struct File File;
 // sd.h
 
 typedef struct File {
+    int FileIndex;
     char filename[64];
     char path[256];
     Folder *parent;
-    FIL *item;
 } File;
 
 typedef struct Folder Folder;
@@ -68,13 +68,9 @@ struct Folder {
     int folder_count;
     Folder *folderlist;
     File *filelist;
-    FIL *item;
 };
 
 Folder* scan_sd_root();
 Folder* scan_directory(char path[256], Folder* parent_folder);
-void free_folder(Folder *folder);
 
-FRESULT sd_file_open(File *file, BYTE mode);
-FRESULT sd_file_close(File *file);
 #endif

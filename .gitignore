@@ -4,6 +4,7 @@
 *.obj
 *.out
 
+*.log
 .idea/
 *~
 *.DotSettings.user
@@ -14,4 +15,6 @@
 build/
 pico_sdk_import.cmake
 *.swp
+
+notes.md
 

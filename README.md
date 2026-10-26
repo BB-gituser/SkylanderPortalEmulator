@@ -4,13 +4,32 @@
 
 <hr>
 
-### **[WARNING]**
-> **Work In Progress> (WIP) — Not Functional**<br>
-> This project is currently under intensive development. The code is **not working** yet and is not ready for use.
-
-<hr>
-
 ## SETUP
+
+### SD card content
+
+```
+SD
+├── Skylanders
+│   └── **/*.bin
+└── pictures
+    ├── air.bmp
+    ├── dark.bmp
+    ├── earth.bmp
+    ├── fire.bmp
+    ├── kaos.bmp
+    ├── life.bmp
+    ├── light.bmp
+    ├── magic.bmp
+    ├── none.bmp
+    ├── tech.bmp
+    ├── undead.bmp
+    └── water.bmp
+```
+
+> **note** : in `**/*.bin` you can have folder whit bin files inside
+> **note** : copy the content of sd_template into your sd card
+
 
 ### CLONE AND INITIALIZE THE PROJECT
 
@@ -35,9 +54,10 @@ If you haven't set up the Pico SDK yet, you can initialize it with the following
 # sample
 (
     cd ~
-    git clone https://github.com/raspberrypi/pico-sdk.git
+    git clone --branch 1.4.0 https://github.com/raspberrypi/pico-sdk.git
     cd pico-sdk
     git submodule update --init
+    sed -i '1i #include <cstdint>' ./tools/pioasm/pio_disassembler.h # add missing header
 )
 export PICO_SDK_PATH=~/pico-sdk
 ```
@@ -53,12 +73,12 @@ cp $PICO_SDK_PATH/external/pico_sdk_import.cmake .
 Build the project using CMake and Make
 
 ```sh
-# ~/.../SkylanderPortalEmulator
+# SkylanderPortalEmulator/
 (
     mkdir build
     cd build
     rm -rf *
-    cmake -DCMAKE_BUILD_TYPE=Release -DPICO_BOARD=pico -DTFT_OPTIONS="TFT_ENABLE_RED;TFT_ENABLE_RESET;TFT_ENABLE_TEXT;TFT_ENABLE_SHAPES;TFT_ENABLE_ROTATE" ..
+    clear && cmake -DCMAKE_BUILD_TYPE=Release -DPICO_BOARD=pico -DTFT_OPTIONS="TFT_ENABLE_RED;TFT_ENABLE_RESET;TFT_ENABLE_TEXT;TFT_ENABLE_SHAPES;TFT_ENABLE_ALL;TFT_ENABLE_ROTATE;TFT_ENABLE_SCROLL;" ..
     make -j$(nproc)
 )
 ```
@@ -90,7 +110,7 @@ Build the project using CMake and Make
 
 ### Joystick
 
-- VCC     : 3.3V (Pin 37)
+- VCC     : 3.3V (Pin 36)
 - GND     : GND (Pin 38)
 - VRX     : GP27
 - VRY     : GP26
@@ -102,10 +122,16 @@ Build the project using CMake and Make
 - TFT LCD user interface support
 - Joystick navigation support
 
+## IN PROGRESS
+
+- documentation page
+- swap force support
+
 ## ROADMAP / IDEAS
 
 - [X] joystick support
 - [X] TFT LCD support
+- [ ] PICO-SDK last version support
 - [ ] option Menu
 - [ ] IR controller support
 - [ ] NFC reader support to save physical figurine `.bin` files in the SD card
@@ -116,18 +142,18 @@ Build the project using CMake and Make
 
 *Coming soon.*
 
-
 ## Known Issues
 
-- Unload figurines
-- Only slot one can be used
-- GUI bugs
+- GUI bugs on refresh
 
 ## CHANGELOGS
 
 - **V0.1**
   - implement the TFT LCD
   - implement the Joystick
+- **V1.0**
+  - load bin files
+  - unload bin files
 
 ## RESSOURCES
 
@@ -135,3 +161,8 @@ Build the project using CMake and Make
 
 - [skylandersNFC](https://github.com/skylandersNFC)
 - [Skylanders-Ultimate-NFC-Pack](https://github.com/skylandersNFC/Skylanders-Ultimate-NFC-Pack)
+- [Skylanders file generator by Marijn Kneppers](https://marijnkneppers.dev/skylanders/generator/)
+
+### Other skylanders ressources
+
+- [Skylanders ID list](https://github.com/Texthead1/Skylander-IDs)

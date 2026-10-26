@@ -8,15 +8,15 @@
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
-#include "../includes/joystick.h"
 #include "../includes/constant.h"
+#include "../includes/joystick.h"
 #include "../includes/pins.h"
 
 uint32_t i = 0;
 
 JoystickStat joystick_get() {
   JoystickStat out;
-  if (i + 200 < to_ms_since_boot(get_absolute_time())) {
+  if (i + TIME_WAIT < to_ms_since_boot(get_absolute_time())) {
     i = to_ms_since_boot(get_absolute_time());
     adc_select_input(0);
     int xValue = adc_read();

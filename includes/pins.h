@@ -12,4 +12,9 @@
 #define PIN_Y               27                 // GP27 / ADC1
 #define PIN_BUTTON          16                 // GP16
 
+
+#ifndef PICO_DEFAULT_LED_PIN
+#define PICO_DEFAULT_LED_PIN 25
+#endif
+
 #endif

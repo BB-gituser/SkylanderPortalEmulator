@@ -13,7 +13,6 @@ static spi_t spis[] = {{
     .baud_rate = 12500 * 1000,
 }};
 
-// Une entree par lecteur de carte SD
 static sd_card_t sd_cards[] = {{.pcName = "0:",
                                 .spi = &spis[0],
                                 .ss_gpio = 5,
