@@ -102,10 +102,11 @@ int main(void) {
       send_status();
       next_status = now + 20;
     }
-    if (last < now) { app_task(); last = now + FPS; }
+    if (last < now) {
+      app_task();
+      last = now + FPS;
+    }
   }
 }
 
-void app_task() {
-  menu_screen_refresh();
-}
+void app_task() { menu_screen_refresh(); }

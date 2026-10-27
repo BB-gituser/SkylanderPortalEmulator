@@ -55,7 +55,7 @@ void show_status(const char *title, const char *content, uint16_t color) {
   setTextWrap(true);
 
   drawText(4, 32, content, color, ST7735_BLACK, 1);
-  
+
   setTextWrap(false);
 }
 
@@ -70,49 +70,50 @@ uint16_t rgb888_to_rgb565(uint8_t r, uint8_t g, uint8_t b) {
 #include "ff.h"
 
 void bmpDraw(uint16_t x, uint16_t y, const char *filename) {
-    FIL fil;
-    FRESULT res;
-    UINT br;
-    uint8_t header[54];
+  FIL fil;
+  FRESULT res;
+  UINT br;
+  uint8_t header[54];
 
-    res = f_open(&fil, filename, FA_READ);
-    if (res != FR_OK) return;
+  res = f_open(&fil, filename, FA_READ);
+  if (res != FR_OK)
+    return;
 
-    res = f_read(&fil, header, 54, &br);
-    if (res != FR_OK || br != 54 || header[0] != 'B' || header[1] != 'M') {
-        f_close(&fil);
-        return;
-    }
-
-    uint32_t dataOffset = *(uint32_t*)&header[10];
-    int32_t width = *(int32_t*)&header[18];
-    int32_t height = *(int32_t*)&header[22];
-    uint16_t bpp = *(uint16_t*)&header[28];
-
-    if (bpp != 24) {
-        f_close(&fil); 
-        return;
-    }
-
-    f_lseek(&fil, dataOffset);
-
-    int row, col;
-    uint8_t rgb[3];
-    int padding = (4 - (width * 3) % 4) % 4;
-
-    // Lecture de bas en haut (standard BMP)
-    for (row = height - 1; row >= 0; row--) {
-        for (col = 0; col < width; col++) {
-            f_read(&fil, rgb, 3, &br);
-            // BMP stocke les couleurs en BGR
-            uint16_t color = rgb888_to_rgb565(rgb[2], rgb[1], rgb[0]);
-            drawPixel(x + col, y + row, color);
-        }
-        if (padding > 0) {
-            uint8_t pad[3];
-            f_read(&fil, pad, padding, &br);
-        }
-    }
-
+  res = f_read(&fil, header, 54, &br);
+  if (res != FR_OK || br != 54 || header[0] != 'B' || header[1] != 'M') {
     f_close(&fil);
+    return;
+  }
+
+  uint32_t dataOffset = *(uint32_t *)&header[10];
+  int32_t width = *(int32_t *)&header[18];
+  int32_t height = *(int32_t *)&header[22];
+  uint16_t bpp = *(uint16_t *)&header[28];
+
+  if (bpp != 24) {
+    f_close(&fil);
+    return;
+  }
+
+  f_lseek(&fil, dataOffset);
+
+  int row, col;
+  uint8_t rgb[3];
+  int padding = (4 - (width * 3) % 4) % 4;
+
+  // Lecture de bas en haut (standard BMP)
+  for (row = height - 1; row >= 0; row--) {
+    for (col = 0; col < width; col++) {
+      f_read(&fil, rgb, 3, &br);
+      // BMP stocke les couleurs en BGR
+      uint16_t color = rgb888_to_rgb565(rgb[2], rgb[1], rgb[0]);
+      drawPixel(x + col, y + row, color);
+    }
+    if (padding > 0) {
+      uint8_t pad[3];
+      f_read(&fil, pad, padding, &br);
+    }
+  }
+
+  f_close(&fil);
 }

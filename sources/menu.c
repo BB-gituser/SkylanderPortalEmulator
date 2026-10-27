@@ -9,15 +9,16 @@
 
 #include "../includes/constant.h"
 #include "../includes/display.h"
+#include "../includes/documentation.h"
 #include "../includes/joystick.h"
 #include "../includes/menu.h"
 #include "../includes/pins.h"
 #include "../includes/sd.h"
 #include "../includes/usb.h"
 #include "../includes/utils.h"
-#include "../includes/documentation.h"
 
-uint32_t can_refresh = 0;  // stop instructions in the loop while current time < can_refresh
+uint32_t can_refresh =
+    0; // stop instructions in the loop while current time < can_refresh
 int refresh_menu = 1;      // allow to refresh menu calling draw_menu
 int reinit_menu = 0;       // allow to call init_menu
 int current_selection = 0; // current index of selection in the menu
@@ -50,131 +51,138 @@ void draw_slide() {
                   rgb888_to_rgb565(127, 127, 127));
     drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
                   rgb888_to_rgb565(0, 0, 0));
-    drawText(15, 40, "not", rgb888_to_rgb565(0, 0, 0), rgb888_to_rgb565(127, 127, 127), 2);
-    drawText(15, 80, "implemented", rgb888_to_rgb565(0, 0, 0), rgb888_to_rgb565(127, 127, 127), 2);
+    drawText(15, 40, "not", rgb888_to_rgb565(0, 0, 0),
+             rgb888_to_rgb565(127, 127, 127), 2);
+    drawText(15, 80, "implemented", rgb888_to_rgb565(0, 0, 0),
+             rgb888_to_rgb565(127, 127, 127), 2);
   } else {
     int nloaded_slots = get_nloaded_slots();
     int slot_i = get_loaded_slot_from_index_loaded(current_selection - 2);
     if (slot_i == -1)
       return;
     Slot *slot = get_slot_from_index(slot_i);
-    if (!slot) return;
+    if (!slot)
+      return;
     skylander_t *fig = slot->skylander;
 
     const char *filename = NULL;
     switch (fig->element) {
-      case SKY_ELEM_NONE:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(128, 128, 128));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(64, 64, 64));
-        filename = "none";
-        break;
+    case SKY_ELEM_NONE:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(128, 128, 128));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(64, 64, 64));
+      filename = "none";
+      break;
 
-      case SKY_ELEM_AIR:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(135, 206, 250));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(70, 130, 180));
-        filename = "air";
-        break;
+    case SKY_ELEM_AIR:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(135, 206, 250));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(70, 130, 180));
+      filename = "air";
+      break;
 
-      case SKY_ELEM_EARTH:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(139, 69, 19));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(92, 51, 23));
-        filename = "earth";
-        break;
+    case SKY_ELEM_EARTH:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(139, 69, 19));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(92, 51, 23));
+      filename = "earth";
+      break;
 
-      case SKY_ELEM_FIRE:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(255, 69, 0));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(178, 34, 34));
-        filename = "fire";
-        break;
+    case SKY_ELEM_FIRE:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(255, 69, 0));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(178, 34, 34));
+      filename = "fire";
+      break;
 
-      case SKY_ELEM_WATER:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(30, 144, 255));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(0, 0, 128));
-        filename = "water";
-        break;
+    case SKY_ELEM_WATER:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(30, 144, 255));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(0, 0, 128));
+      filename = "water";
+      break;
 
-      case SKY_ELEM_MAGIC:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(138, 43, 226));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(75, 0, 130));
-        filename = "magic";
-        break;
+    case SKY_ELEM_MAGIC:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(138, 43, 226));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(75, 0, 130));
+      filename = "magic";
+      break;
 
-      case SKY_ELEM_TECH:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(192, 192, 192));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(105, 105, 105));
-        filename = "tech";
-        break;
+    case SKY_ELEM_TECH:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(192, 192, 192));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(105, 105, 105));
+      filename = "tech";
+      break;
 
-      case SKY_ELEM_LIFE:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(50, 205, 50));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(34, 139, 34));
-        filename = "life";
-        break;
+    case SKY_ELEM_LIFE:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(50, 205, 50));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(34, 139, 34));
+      filename = "life";
+      break;
 
-      case SKY_ELEM_UNDEAD:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(47, 79, 79));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(0, 0, 0));
-        filename = "undead";
-        break;
+    case SKY_ELEM_UNDEAD:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(47, 79, 79));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(0, 0, 0));
+      filename = "undead";
+      break;
 
-      case SKY_ELEM_LIGHT:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(255, 255, 0));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(218, 165, 32));
-        filename = "light";
-        break;
+    case SKY_ELEM_LIGHT:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(255, 255, 0));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(218, 165, 32));
+      filename = "light";
+      break;
 
-      case SKY_ELEM_DARK:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(40, 40, 40));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(10, 10, 10));
-        filename = "dark";
-        break;
+    case SKY_ELEM_DARK:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(40, 40, 40));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(10, 10, 10));
+      filename = "dark";
+      break;
 
-      case SKY_ELEM_KAOS:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(139, 0, 139));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(75, 0, 130));
-        filename = "kaos";
-        break;
+    case SKY_ELEM_KAOS:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(139, 0, 139));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(75, 0, 130));
+      filename = "kaos";
+      break;
 
-      case SKY_ELEM_UNKNOWN:
-      case SKY_ELEM_COUNT:
-      default:
-        fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(50, 50, 50));
-        drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
-                      rgb888_to_rgb565(100, 100, 100));
-        filename = NULL;
-        break;
+    case SKY_ELEM_UNKNOWN:
+    case SKY_ELEM_COUNT:
+    default:
+      fillRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(50, 50, 50));
+      drawRoundRect(10, 35, SCREEN_W - 20, SCREEN_H - 45, 15,
+                    rgb888_to_rgb565(100, 100, 100));
+      filename = NULL;
+      break;
     }
     if (filename != NULL) {
       char filepath[64];
       snprintf(filepath, sizeof(filepath), "0:/pictures/%s.bmp", filename);
-      bmpDraw(15, 40, (uint8_t*)filepath);
+      bmpDraw(15, 40, (uint8_t *)filepath);
     }
-     drawText(15, 80, fig->name, rgb888_to_rgb565(0, 0, 0), rgb888_to_rgb565(255, 255, 255), 2);
+    setTextWrap(true);
+    drawText(15, 80, fig->name, rgb888_to_rgb565(0, 0, 0),
+             rgb888_to_rgb565(255, 255, 255), 2);
+
+    setTextWrap(false);
   }
 }
 
@@ -188,7 +196,8 @@ void init_menu() {
 void draw_menu(const char *title, char **items, int nb_items) {
   fillRoundRect(0, 0, SCREEN_W, 20, 15, rgb888_to_rgb565(150, 150, 150));
   fillRectangle(0, 0, SCREEN_W, 10, rgb888_to_rgb565(150, 150, 150));
-  drawText(10, 5, title, rgb888_to_rgb565(255, 0, 0), rgb888_to_rgb565(150, 150, 150), 2);
+  drawText(10, 5, title, rgb888_to_rgb565(255, 0, 0),
+           rgb888_to_rgb565(150, 150, 150), 2);
   drawText(2, 24, "press left to back", ST7735_BLUE, ST7735_BLACK, 1);
   int start_index = 0;
   if (current_selection >= MAX_VISIBLE_ITEMS) {
@@ -217,14 +226,15 @@ void render_figurine_menu() {
     wait(1000);
     return;
   }
-  
+
   JoystickStat s = joystick_get();
   if (s.top) {
     current_selection = (current_selection == 0) ? 0 : current_selection - 1;
-    if (current_selection < 0) current_selection = 0;
+    if (current_selection < 0)
+      current_selection = 0;
     refresh_menu = 1;
   } else if (s.bottom) {
-    current_selection =( current_selection == 2) ? 2 : current_selection + 1;
+    current_selection = (current_selection == 2) ? 2 : current_selection + 1;
     refresh_menu = 1;
   }
   if (s.press) {
@@ -234,7 +244,8 @@ void render_figurine_menu() {
       current_menu = 0;
       refresh_menu = 1;
       return;
-    } if (current_selection == 1) {
+    }
+    if (current_selection == 1) {
       int slot_i = get_loaded_slot_from_index_loaded(fig_index);
       if (slot_i == -1) {
         show_status("ERRORS", "fail on unload figurine", 0xffff);
@@ -252,30 +263,25 @@ void render_figurine_menu() {
     }
   }
 
-
   if (!refresh_menu)
     return;
-  
+
   int nloaded_slots = get_nloaded_slots();
   int slot_i = get_loaded_slot_from_index_loaded(fig_index);
-  if (slot_i == -1){
-      show_status("NO figures", "bad index", 0xffff);
-      wait(1000);
+  if (slot_i == -1) {
+    show_status("NO figures", "bad index", 0xffff);
+    wait(1000);
   }
   Slot *slot = get_slot_from_index(slot_i);
   if (!slot) {
-      show_status("NO SLOT", "no slot found", 0xffff);
-      wait(1000);
+    show_status("NO SLOT", "no slot found", 0xffff);
+    wait(1000);
   }
   skylander_t *fig = slot->skylander;
 
   char title[64] = {0};
   snprintf(title, 64, "menu %s", fig->name);
-  char *items[] = {
-    "back to menu",
-    "unload",
-    "infos"
-  };
+  char *items[] = {"back to menu", "unload", "infos"};
 
   draw_menu(title, items, 3);
   refresh_menu = 0;
@@ -288,7 +294,9 @@ void render_main_menu() {
     current_selection = current_selection == 0 ? 0 : current_selection - 1;
     refresh_menu = 1;
   } else if (s.right) {
-    current_selection = current_selection == 1 + get_nloaded_slots() ? 1 + get_nloaded_slots() : current_selection + 1;
+    current_selection = current_selection == 1 + get_nloaded_slots()
+                            ? 1 + get_nloaded_slots()
+                            : current_selection + 1;
     refresh_menu = 1;
   }
   if (s.press) {
@@ -297,7 +305,8 @@ void render_main_menu() {
       reinit_menu = 1;
       current_menu = 2;
       return;
-    } if (current_selection == 1) {
+    }
+    if (current_selection == 1) {
       scroll_index = 0;
       current_menu = 1;
       return;
@@ -310,7 +319,6 @@ void render_main_menu() {
       return;
     }
   }
-
 
   // draw
   if (!refresh_menu)
@@ -325,7 +333,8 @@ void render_main_menu() {
 }
 
 void select_file_render_menu() {
-  if (!cur_folder) cur_folder = root;
+  if (!cur_folder)
+    cur_folder = root;
   Folder *folder = cur_folder;
   int max_select = folder->folder_count + folder->file_count;
 
@@ -336,7 +345,8 @@ void select_file_render_menu() {
   }
   if (s.bottom) {
     refresh_menu = 1;
-    current_selection < max_select - 1 ? current_selection += 1 : max_select - 1;
+    current_selection < max_select - 1 ? current_selection += 1
+                                       : max_select - 1;
   }
   if (s.left) {
     refresh_menu = 1;
@@ -358,7 +368,8 @@ void select_file_render_menu() {
       reinit_menu = 1;
       return;
     } else {
-      File *F = ((folder->filelist) + current_selection - (folder->folder_count));
+      File *F =
+          ((folder->filelist) + current_selection - (folder->folder_count));
       if (File_is_used_by_index(F->FileIndex)) {
         show_status("ERROR", "file already used", ST7735_RED);
         wait(2000);
@@ -368,7 +379,8 @@ void select_file_render_menu() {
       int res = load_slot(F, &index_);
       if (res) {
         char text[128] = {0};
-        snprintf(text, 128, "an error occured : %d\npaths : `%s`", res, F->path);
+        snprintf(text, 128, "an error occured : %d\npaths : `%s`", res,
+                 F->path);
         show_status("ERROR", text, ST7735_RED);
         wait(2000);
         return;
@@ -395,11 +407,10 @@ void select_file_render_menu() {
     pos++;
   }
   reset_screen(ST7735_BLACK);
-  
-  draw_menu("SELECT FIGURINE", items, max_select);
-  refresh_menu=0;
-}
 
+  draw_menu("SELECT FIGURINE", items, max_select);
+  refresh_menu = 0;
+}
 
 void doc_menu() {
   JoystickStat s = joystick_get();
@@ -421,7 +432,8 @@ void doc_menu() {
     setRotation(1);
     return;
   }
-  if (!refresh_menu) return;
+  if (!refresh_menu)
+    return;
   setTextWrap(true);
   char *doc_text = "DOCUMENTATION"
                    "-------------"
@@ -433,13 +445,14 @@ void doc_menu() {
   setScrollDefinition(10, 10, 0);
   setRotation(1);
   fillRectangle(0, 0, SCREEN_W, SCREEN_H, ST7735_BLACK);
-  fillRectangle(0, 10, SCREEN_W, SCREEN_H - 10, rgb888_to_rgb565(200,200,200));
-  drawText(5, 15, doc_text, ST7735_BLACK, rgb888_to_rgb565(200,200,200), 1);
+  fillRectangle(0, 10, SCREEN_W, SCREEN_H - 10,
+                rgb888_to_rgb565(200, 200, 200));
+  drawText(5, 15, doc_text, ST7735_BLACK, rgb888_to_rgb565(200, 200, 200), 1);
   VerticalScroll(scroll_index);
 
   setTextWrap(false);
   refresh_menu = 0;
-} 
+}
 
 void menu_screen_refresh() {
   if (cur_time() > can_refresh) {
@@ -452,8 +465,11 @@ void menu_screen_refresh() {
     can_refresh = cur_time() + 1000 / 24;
 
     // action
-    if (current_menu == 0) render_main_menu();
-    if (current_menu == 1) {current_menu = 0;}//{doc_menu();} // infos
+    if (current_menu == 0)
+      render_main_menu();
+    if (current_menu == 1) {
+      current_menu = 0;
+    } //{doc_menu();} // infos
     if (current_menu == 2) {
       select_file_render_menu();
     }

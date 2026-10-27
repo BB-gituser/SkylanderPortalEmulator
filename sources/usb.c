@@ -15,7 +15,8 @@ static volatile uint8_t queue_head = 0, queue_tail = 0;
 
 static bool queue_push(const uint8_t *report) {
   uint8_t next = (queue_head + 1) % QUEUE_LEN;
-  if (next == queue_tail) return false;
+  if (next == queue_tail)
+    return false;
   memcpy(queue[queue_head], report, MSG_SIZE);
   queue_head = next;
   return true;
@@ -27,7 +28,6 @@ void queue_dequeue(void) {
       tud_hid_report(0, queue[queue_tail], MSG_SIZE))
     queue_tail = (queue_tail + 1) % QUEUE_LEN;
 }
-
 
 // doc https://docs.tinyusb.org/en/latest/reference/class/device.html
 
@@ -42,9 +42,7 @@ static FIL *slot_file(uint8_t index_byte) {
   return s->fil;
 }
 
-void send_report(const uint8_t *report) {
-  send_report_size(report, MSG_SIZE);
-}
+void send_report(const uint8_t *report) { send_report_size(report, MSG_SIZE); }
 
 void send_report_size(const uint8_t *report, int size) {
   (void)size;
