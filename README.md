@@ -54,7 +54,7 @@ If you haven't set up the Pico SDK yet, you can initialize it with the following
 # sample
 (
     cd ~
-    git clone --branch 1.4.0 https://github.com/raspberrypi/pico-sdk.git
+    git clone https://github.com/raspberrypi/pico-sdk.git
     cd pico-sdk
     git submodule update --init
     sed -i '1i #include <cstdint>' ./tools/pioasm/pio_disassembler.h # add missing header
@@ -131,7 +131,7 @@ Build the project using CMake and Make
 
 - [X] joystick support
 - [X] TFT LCD support
-- [ ] PICO-SDK last version support
+- [X] PICO-SDK last version support
 - [ ] option Menu
 - [ ] IR controller support
 - [ ] NFC reader support to save physical figurine `.bin` files in the SD card
