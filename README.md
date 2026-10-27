@@ -161,7 +161,6 @@ Build the project using CMake and Make
 
 - [skylandersNFC](https://github.com/skylandersNFC)
 - [Skylanders-Ultimate-NFC-Pack](https://github.com/skylandersNFC/Skylanders-Ultimate-NFC-Pack)
-- [Skylanders file generator by Marijn Kneppers](https://marijnkneppers.dev/skylanders/generator/)
 
 ### Other skylanders ressources
 
