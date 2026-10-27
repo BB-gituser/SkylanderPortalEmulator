@@ -25,6 +25,7 @@ int current_menu = 0;      // current menu
 Folder *cur_folder = NULL; // current folder when explore files
 int fig_index = -1;        // for figurines menu
 
+int scroll_index = 0;
 
 void wait(uint32_t t) { // set can_refresh to current time + t (ms)
   can_refresh = cur_time() + t;
@@ -297,7 +298,9 @@ void render_main_menu() {
       current_menu = 2;
       return;
     } if (current_selection == 1) {
-      // infos
+      scroll_index = 0;
+      current_menu = 1;
+      return;
     } else {
       fig_index = current_selection - 2;
       current_menu = 3;
@@ -397,7 +400,46 @@ void select_file_render_menu() {
   refresh_menu=0;
 }
 
-void doc_menu() {} // for documentation
+
+void doc_menu() {
+  JoystickStat s = joystick_get();
+  if (s.top) {
+    refresh_menu = 1;
+    scroll_index--;
+  }
+  if (s.bottom) {
+    refresh_menu = 1;
+    scroll_index++;
+  }
+  if (s.left) {
+    refresh_menu = 1;
+    current_menu = 0;
+    reinit_menu = 1;
+    current_selection = 0;
+    init_menu();
+    NormalDisplay();
+    setRotation(1);
+    return;
+  }
+  if (!refresh_menu) return;
+  setTextWrap(true);
+  char *doc_text = "DOCUMENTATION"
+                   "-------------"
+                   "Skylanders portal emulator"
+                   "It functions like a portal"
+                   "you can add and remove figurines (bin files)"
+                   "if you have any bugs, please reports them";
+
+  setScrollDefinition(10, 10, 0);
+  setRotation(1);
+  fillRectangle(0, 0, SCREEN_W, SCREEN_H, ST7735_BLACK);
+  fillRectangle(0, 10, SCREEN_W, SCREEN_H - 10, rgb888_to_rgb565(200,200,200));
+  drawText(5, 15, doc_text, ST7735_BLACK, rgb888_to_rgb565(200,200,200), 1);
+  VerticalScroll(scroll_index);
+
+  setTextWrap(false);
+  refresh_menu = 0;
+} 
 
 void menu_screen_refresh() {
   if (cur_time() > can_refresh) {
@@ -411,7 +453,7 @@ void menu_screen_refresh() {
 
     // action
     if (current_menu == 0) render_main_menu();
-    if (current_menu == 1) {}//{doc_menu();} // infos
+    if (current_menu == 1) {current_menu = 0;}//{doc_menu();} // infos
     if (current_menu == 2) {
       select_file_render_menu();
     }
