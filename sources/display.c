@@ -18,6 +18,28 @@
 #include "../includes/display.h"
 #include "../includes/pins.h"
 
+void my_drawText(uint8_t x, uint8_t y, const char *_text, uint16_t color, uint16_t bg, uint8_t size) {
+  uint8_t cursor_x, cursor_y;
+  uint16_t textsize, i;
+  cursor_x = x, cursor_y = y;
+  textsize = strlen(_text);
+  for(i = 0; i < textsize; i++){
+    if(((cursor_x + size * 5) > tft_width) || _text[i] == '\n') {
+      cursor_x = 0;
+      cursor_y = cursor_y + size * 7 + 3 ;
+      if(cursor_y > tft_height) cursor_y = tft_height;
+      if(_text[i] == LCD_ASCII_OFFSET) {
+        continue;
+      }
+    }
+    if (_text[i] != '\n') drawChar(cursor_x, cursor_y, _text[i], color, bg, size);
+    cursor_x = cursor_x + size * 6;
+    if(cursor_x > tft_width) {
+      cursor_x = tft_width;
+    }
+  }
+}
+
 void init_display(void) {
   spi_init(TFT_SPI, TFT_SPI_BAUD);
   gpio_set_function(TFT_PIN_SCK, GPIO_FUNC_SPI);
@@ -52,9 +74,10 @@ void show_status(const char *title, const char *content, uint16_t color) {
 
   int i = 0;
   int ind = 0;
+  
   setTextWrap(true);
 
-  drawText(4, 32, content, color, ST7735_BLACK, 1);
+  my_drawText(4, 32, content, color, ST7735_BLACK, 1);
 
   setTextWrap(false);
 }
