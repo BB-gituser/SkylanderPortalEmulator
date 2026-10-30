@@ -408,7 +408,7 @@ void select_file_render_menu() {
   }
   reset_screen(ST7735_BLACK);
 
-  draw_menu("SELECT FIGURINE", items, max_select);
+  draw_menu("SELECT FILE", items, max_select);
   refresh_menu = 0;
 }
 

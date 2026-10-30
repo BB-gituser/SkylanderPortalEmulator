@@ -3,10 +3,6 @@
 
 #include "ff.h"
 
-typedef struct {
-    FIL *slot0;
-} Object;
-
 typedef enum {
     SKY_ELEM_NONE = 0,
     SKY_ELEM_UNKNOWN,

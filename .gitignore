@@ -18,3 +18,4 @@ pico_sdk_import.cmake
 
 notes.md
 
+tests/
